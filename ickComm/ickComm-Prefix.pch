@@ -1,0 +1,23 @@
+//
+//  Prefix header
+//
+//  The contents of this file are implicitly included at the beginning of every source file.
+//
+
+#ifdef __OBJC__
+    #import <UIKit/UIKit.h>
+    #import <Foundation/Foundation.h>
+    #import "UIDevice_ickStream.h"
+    #import "UIView_ickStream.h"
+#import "NSDictionary_ickStream.h"
+#import "NSString_ickStream.h"
+#import "NSArray_ickStream.h"
+#import <SystemConfiguration/SystemConfiguration.h>
+#import <MobileCoreServices/MobileCoreServices.h>
+#import "UIDevice+IdentifierAddition.h"
+#endif
+
+
+#import "ickP2p.h"
+
+#import "GCD_Helper.h"

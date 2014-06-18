@@ -1,0 +1,33 @@
+The request system consists of three classes, the ISPRequest class which is the actual frontend to be used by the App and it's objects and two "atomic" request classes (ISPRHttpRequest and ISPRWebsocketRequest) which encapsulate the different types of requests being used "under the hood". An "atomic" request class is a class implementing the ISPAtomicRequestProtocol formal protocol.
+
+ISPRequest integrates with the ISPDevice classes by using these classes to actually create the appropriate "atomic" request objects to communicate with the actual devices represente by ISPDevice objects. So, if you create an ISPRequest to communicate with a device on a local network (or a service provided by such a device) the ISPDevice object will create an instance of ISPRWebsocketRequest to communicate through ickP2p. If you create an ISPRequest to communicate with a service provided by the ickStream Cloud then the ISPDeviceCloud singleton object will create an ISPRHttpRequest object.
+
+ISPRWebsocketRequest also provides the communication callback for the websocket communication, for this reason it currently needs to be initialized during the ISPDevice initialization making the two frameworks interdependent and breaching encapsulation. As long as there is a fixed initialization sequence (something supposed to be changed in later versions of ickP2p) this is hard to avoid without removing the whole initialization process from the class.
+
+If there is ever a communication with other services or devices (e.g. DLNA devices) it could be integrated into the loading system by providing an ISPDevice subclass managing specific properties and implementing an atomic request class for the communication with the new device type.
+
+
+ISPRequest objects can serve two purposes: they can either be used to send a command (or notification) to a device or service or they can be used to request information (sending a request and expecting an answer).
+Request objects can be persiatant (if they are supposed to be reused by the creating object) ot they can be non-persistant. Non-persistant request objects will be retained by the ISPRequest systen until they are no longer needed (until the request is completed or failed) and then automatically released; persistant objects need to be retained by their creating object.
+
+
+Usage:
+ISPRequest can be used either block- or target/action based. The block based syntax is recommended.
+
+The usage process is as follows:
+
+1. Create an ISPRequest object through alloc and the initializer for either the block based or non-block-based use.
+2. Set the answer objects. For block based use you can either do this in the initializer or by directly setting the "responseBlock" and "errorBlock" properties, for target/action use you can use setTarget:withSelector:withErrorSelector.
+2a. Optionally set a range for a request. This is especially useful when requesting longer lists and using paging in connection with a persistant request object. In this scenario, you would create the request object only once and then for each page just update the range before calling the same request again.
+3. Execute the request through [request call]
+
+There are a number of helper methods to create "automatic" requests. "Automatic" requests are requests are being sent immediately after execution and do already call themselves (you don't need and shall not execute them througn [request call]). With the target/action scheme these can not be used to retrieve answers but you can do so using the block-based syntax by using the appropriate helper methods.
+
+Usually, a request expects a full command as a JSON fragment, either un-encoded (as an NSDictionary) or encoded (as NSString). But there are also helper functions to create a JSON object by supplying the ickStream command method plus an appropriate parameter dictionary.
+
+
+Targeting:
+
+To send a request to a service you will usually only supply the serviceId and the device can be nil, it will be looked up in the device list by ISPRequest.
+To communicate with a device (usually a player), not a service, you don't need to specify a service but only a device.
+

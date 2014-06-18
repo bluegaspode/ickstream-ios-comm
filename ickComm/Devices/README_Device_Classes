@@ -1,0 +1,52 @@
+To use the ISPDevice classes, you need to first initialize the stack as follows:
+
+0. Set the application id using [ISPDeviceMyself setApplicationId:<my application id>];
+The application id should be different for each App and needs to be acquired from ickStream.
+
+1. Call [ISPDevice initializeIckStreamWithDeviceName:nil];
+This will do the following steps to initialize the ISPDevice stack:
+- initialize an ickP2p context for a device name identical to the current iOS device name (specify a name string instead of nil to override)
+- add WiFi and loopback adaptors to ickP2p (so that devices on the current network can be discovered)
+- register a device callback to add newly found devices
+- register the websocket callback, thus initializing the ISPRWebsocket class. This is a breack of the object encpsulation (it creates a dependency between ISPDevice and ISPRequest classes) but since ickP2p currently requires the callback to be set before the initialization gets completed there's littel way around it right now.
+- configure ickP2p (enable debug mode and enable loopback)
+- call ickP2pResume to start the ickP2p Discovery
+
+2. Call [[ISPDeviceMyself alloc] initWithType:ICKP2P_SERVICE_CONTROLLER];
+This will initialize the Controller as an ickStream device. It does the following steps:
+- Generate a unique device hardware ID based on the vendor identifier for the device.
+- Read a device token fron NSUserDefault. The device token is the token authorizing the device to use the account of the user the device has been registered for.
+- If there is no device token or it's for a different hardware ID, a web view will be opened to register the device on api.ickstream.com and acquire a device token for the user. The user logs in in the web view and authorizes the device to use his account; a device token will be returned that acts as an authorization key.
+
+Note: The process above only works for controller-only devices. If you want to use a player the process needs to be changed to acquire the device token before calling ickP2pResume (or the player needs to be added to the ickP2p discovery later which is currently unreliable). ISPDeviceMyself contains stub code to include a player in the startup process but this is not supported by this version of the stack.
+
+3. Call [[ISPDeviceCloud singleton] getCloudServices];
+This will acquire the list available cloud services for the user (based on the device token acquired in step 2).
+
+4. Implement notification handlers. 
+New devices, content services, player states etc. will be notified through the notification center. There is documentation for these notifications in Notifications.rtf
+You probably want to have these notification handlers in place before the actual discovery starts (or getCloudServices gets called) but if they are not, you can always get the list of already found services from ISPDevice. This is a two-step approach, though: you have to get the service ID for the services you are interested in, then get the device that provides this service and the device will have a list of service descriptions (device.services) for all of it's services which will then contain the whole service description information. Making sure the initial notification (which contains the service name) gets caught will make initial menu name setup easier.
+
+
+
+
+The device class hierarchy works as follows:
+
+ISPDevice: This class encapsulates device discovery (and the device discovery callback from ickP2p). For each discovered device, it's type will be registered. Devices that provide services (ICKP2P_SERVICE_SERVER_GENERIC) a list of services provided by this device will be maintained.
+ISPDevice also maintains a master list of all services found accessible through the class object.
+ISPDevice objects are also being used as the endpoint class to communicate with a device.
+ISPDevice is not an abstract class but ISPDevice objects will be generated for generic server objects. ISPDevice instances use ickP2p to communicate with the actual devices they represent.
+ISPDevice classes integrate with the ISPRequest stack by acting as an endpoint for communication requests and by providing wrapper methods to create the correct atomic (internal) request objects to be used in the communication with the devices they represent. This way, a calling object doesn't have to know what type of device or interface it's communicating through when trying to access a device or service.
+
+ISPDeviceCloud: This is a subclass of ISPDevice that can be used to communicate to the cloud server. ISPDeviceCloud is a singleton and doesn't communicate through ickP2p but through http communication.
+The ISPDeviceCloud singleton object manages the services supplied by the ickStream cloud like ISPDevice instances manage services provided by local devices.
+
+ISPDeviceMyself: Another singleton, in this case the one representing the devices associated with the App itself. In case the App contains a player, this object should also represent this player object but it can take a dual role representing both a player and a controller.
+As a controller object it will manage the necessary authentication and authorization against the ickStream system, it will register the device on api.ickstream.com and manage the access tokens. It will also supply the access token to control a player.
+
+ISPPlayer: This is a class representing remote players that can be controlled through a controller App.
+Note: an "own" player - if an App acts as such - would be represented by ISPDeviceMyself but would also be "found" as a remote ISPDevice object so the controller part of the App doesn't have to know about this "own" player at all.
+ISPPlayer objects contain a player ans playlist status and send notifications whenever that status changes.
+
+
+
