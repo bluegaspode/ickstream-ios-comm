@@ -156,6 +156,7 @@ static BOOL ickStreamActive = NO;
                                   NULL);
     
     ickP2pAddInterface(_ickP2pContext, "en0", NULL);
+    ickP2pAddInterface(_ickP2pContext, "en1", NULL);
     ickP2pAddInterface(_ickP2pContext, "127.0.0.1", NULL);
     ickP2pRegisterDiscoveryCallback(_ickP2pContext, &gotADevice);
     [ISPRWebsocketRequest registerCallback]; //uuuuuuugggggllllllyyyyyyyyy
