@@ -10,7 +10,6 @@
 		4C5FEBFD192D5D0F0037CB9C /* ISPSpinner.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C5FEBFB192D5D0F0037CB9C /* ISPSpinner.m */; };
 		4C5FEBFF192D67750037CB9C /* Notifications.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 4C5FEBFE192D67750037CB9C /* Notifications.rtf */; };
 		4CD8E80C1925F8BC00B8E3BD /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CD8E80B1925F8BC00B8E3BD /* Foundation.framework */; };
-		4CD8E8111925F8BC00B8E3BD /* ickComm.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4CD8E8101925F8BC00B8E3BD /* ickComm.h */; };
 		4CD8E8131925F8BC00B8E3BD /* ickComm.m in Sources */ = {isa = PBXBuildFile; fileRef = 4CD8E8121925F8BC00B8E3BD /* ickComm.m */; };
 		4CD8E81A1925F8BC00B8E3BD /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CD8E8191925F8BC00B8E3BD /* XCTest.framework */; };
 		4CD8E81B1925F8BC00B8E3BD /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CD8E80B1925F8BC00B8E3BD /* Foundation.framework */; };
@@ -138,6 +137,25 @@
 		71F443CB194F09370028AE5A /* myappsbws_dis@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 4CD8E8B01925FDDE00B8E3BD /* myappsbws_dis@2x.png */; };
 		71F443CC194F09370028AE5A /* refresharrow.png in Resources */ = {isa = PBXBuildFile; fileRef = 4CD8E8B11925FDDE00B8E3BD /* refresharrow.png */; };
 		71F443CD194F09370028AE5A /* refresharrow@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 4CD8E8B21925FDDE00B8E3BD /* refresharrow@2x.png */; };
+		D03500E21955CF3600A7E021 /* ISPDevice.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4CD8E8C4192B8BBA00B8E3BD /* ISPDevice.h */; };
+		D03500E31955CF3600A7E021 /* ISPDeviceCloud.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4CD8E8C6192B8BBA00B8E3BD /* ISPDeviceCloud.h */; };
+		D03500E41955CF3600A7E021 /* ISPDeviceMyself.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4CD8E8C8192B8BBA00B8E3BD /* ISPDeviceMyself.h */; };
+		D03500E51955CF3600A7E021 /* ISPPlayer.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4CD8E8CA192B8BBA00B8E3BD /* ISPPlayer.h */; };
+		D03500E61955CFA600A7E021 /* ISPRequest.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4CD8E8421925F91900B8E3BD /* ISPRequest.h */; };
+		D03500E71955CFA600A7E021 /* ISPRHttpRequest.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4CD8E8441925F91900B8E3BD /* ISPRHttpRequest.h */; };
+		D03500E81955CFA600A7E021 /* ISPRWebsocketRequest.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4CD8E8461925F91900B8E3BD /* ISPRWebsocketRequest.h */; };
+		D03500E91955CFBB00A7E021 /* UIView_ickStream.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4CD8E8C01925FE8C00B8E3BD /* UIView_ickStream.h */; };
+		D03500EA1955CFBB00A7E021 /* ISPUserViewController.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4CD8E8A41925FD9200B8E3BD /* ISPUserViewController.h */; };
+		D03500EB1955CFEB00A7E021 /* ickDescription.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4CD8E8521925F99300B8E3BD /* ickDescription.h */; };
+		D03500EC1955CFEB00A7E021 /* ickDevice.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4CD8E8541925F99300B8E3BD /* ickDevice.h */; };
+		D03500ED1955CFEB00A7E021 /* ickIpTools.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4CD8E8571925F99300B8E3BD /* ickIpTools.h */; };
+		D03500EE1955CFEB00A7E021 /* ickP2p.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4CD8E85B1925F99300B8E3BD /* ickP2p.h */; };
+		D03500EF1955CFEB00A7E021 /* ickP2pCom.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4CD8E85D1925F99300B8E3BD /* ickP2pCom.h */; };
+		D03500F01955CFEB00A7E021 /* ickP2pDebug.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4CD8E85F1925F99300B8E3BD /* ickP2pDebug.h */; };
+		D03500F11955CFEB00A7E021 /* ickSSDP.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4CD8E8621925F99300B8E3BD /* ickSSDP.h */; };
+		D03500F21955CFEB00A7E021 /* ickWGet.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4CD8E8641925F99300B8E3BD /* ickWGet.h */; };
+		D03500F31955CFEB00A7E021 /* logutils.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4CD8E8661925F99300B8E3BD /* logutils.h */; };
+		D03500F41955D08D00A7E021 /* GCD_Helper.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4CD8E88C1925FA5900B8E3BD /* GCD_Helper.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -158,13 +176,31 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		4CD8E8061925F8BC00B8E3BD /* CopyFiles */ = {
+		D035006419558C4E00A7E021 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
-			dstPath = "include/$(PRODUCT_NAME)";
+			dstPath = "include/${PRODUCT_NAME}";
 			dstSubfolderSpec = 16;
 			files = (
-				4CD8E8111925F8BC00B8E3BD /* ickComm.h in CopyFiles */,
+				D03500F41955D08D00A7E021 /* GCD_Helper.h in CopyFiles */,
+				D03500EB1955CFEB00A7E021 /* ickDescription.h in CopyFiles */,
+				D03500EC1955CFEB00A7E021 /* ickDevice.h in CopyFiles */,
+				D03500ED1955CFEB00A7E021 /* ickIpTools.h in CopyFiles */,
+				D03500EE1955CFEB00A7E021 /* ickP2p.h in CopyFiles */,
+				D03500EF1955CFEB00A7E021 /* ickP2pCom.h in CopyFiles */,
+				D03500F01955CFEB00A7E021 /* ickP2pDebug.h in CopyFiles */,
+				D03500F11955CFEB00A7E021 /* ickSSDP.h in CopyFiles */,
+				D03500F21955CFEB00A7E021 /* ickWGet.h in CopyFiles */,
+				D03500F31955CFEB00A7E021 /* logutils.h in CopyFiles */,
+				D03500E91955CFBB00A7E021 /* UIView_ickStream.h in CopyFiles */,
+				D03500EA1955CFBB00A7E021 /* ISPUserViewController.h in CopyFiles */,
+				D03500E61955CFA600A7E021 /* ISPRequest.h in CopyFiles */,
+				D03500E71955CFA600A7E021 /* ISPRHttpRequest.h in CopyFiles */,
+				D03500E81955CFA600A7E021 /* ISPRWebsocketRequest.h in CopyFiles */,
+				D03500E21955CF3600A7E021 /* ISPDevice.h in CopyFiles */,
+				D03500E31955CF3600A7E021 /* ISPDeviceCloud.h in CopyFiles */,
+				D03500E41955CF3600A7E021 /* ISPDeviceMyself.h in CopyFiles */,
+				D03500E51955CF3600A7E021 /* ISPPlayer.h in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -632,7 +668,7 @@
 			buildPhases = (
 				4CD8E8041925F8BC00B8E3BD /* Sources */,
 				4CD8E8051925F8BC00B8E3BD /* Frameworks */,
-				4CD8E8061925F8BC00B8E3BD /* CopyFiles */,
+				D035006419558C4E00A7E021 /* CopyFiles */,
 			);
 			buildRules = (
 			);
