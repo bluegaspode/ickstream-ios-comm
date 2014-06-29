@@ -96,11 +96,6 @@ static void gotADevice(ickP2pContext_t *ictx, const char * UUID, ickP2pDeviceSta
             
             if ([aDevice configureWithUUID:UUID] || !aDevice.url) {
                 [aDevice configureWithURLString:IP];
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [[NSNotificationCenter defaultCenter] postNotificationName:@"ISPPlayerListChangedNotification"
-                                                                        object:aDevice
-                                                                      userInfo:nil];
-                });
             }
             // nope - we only do this whenever the status message comes in
             //[aDevice checkAccount];
