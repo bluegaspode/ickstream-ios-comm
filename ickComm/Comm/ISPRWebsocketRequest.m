@@ -54,38 +54,42 @@ static void gotAMessage(ickP2pContext_t *ictx,
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
         NSError * error;
         id reply = [NSJSONSerialization JSONObjectWithData:messageData options:NSJSONReadingMutableContainers error:&error];
-    
-        NSLog(@"error: %@", error);
-        /*if ([[UIDevice currentDevice] isIOS5]) {
-         reply = [NSJSONSerialization JSONObjectWithData:[NSData dataWithBytes:message length:message_size] options:NSJSONReadingMutableContainers error:nil];
-         } else {
-         replyStr = [[NSString alloc] initWithUTF8String:message];
-         reply = [replyStr JSONValue];
-         }*/
-        
-        if(![reply isKindOfClass: [NSDictionary class]]) {
-            // no idea how to react... we don't know what request this belongs to...
-            return;
-        }
-        NSDictionary * replyDict = reply;
-        id rId = [replyDict numericalForKey:@"id"];
-        if (rId) {
-            NSUInteger iId = 0;
-            if ([rId respondsToSelector:@selector(unsignedIntValue)])
-                iId = [rId unsignedIntValue];
-            else
-                iId = [rId intValue];
-            
-            ISPRequest * request = [ISPRequest requestForId:iId];
-            if (request)
-                [request didReceiveResponse:replyDict];
-        } else {
-            // this means we are seeing a notification
-            NSString * uuidStr = [NSString stringWithUTF8String:sourceUUID];
-            ISPDevice * device = [ISPDevice findDeviceWithUUID:uuidStr andType:ickP2pGetDeviceServices(ictx, sourceUUID)];
-            [device handleDeviceNotification:[replyDict stringForKey:@"method"]
-                                      params:[replyDict dictionaryForKey:@"params"]];
-        }
+
+
+        dispatch_async(dispatch_get_main_queue(), ^{
+            NSLog(@"error: %@", error);
+            /*if ([[UIDevice currentDevice] isIOS5]) {
+             reply = [NSJSONSerialization JSONObjectWithData:[NSData dataWithBytes:message length:message_size] options:NSJSONReadingMutableContainers error:nil];
+             } else {
+             replyStr = [[NSString alloc] initWithUTF8String:message];
+             reply = [replyStr JSONValue];
+             }*/
+
+            if(![reply isKindOfClass: [NSDictionary class]]) {
+                // no idea how to react... we don't know what request this belongs to...
+                return;
+            }
+            NSDictionary * replyDict = reply;
+            id rId = [replyDict numericalForKey:@"id"];
+            if (rId) {
+                NSUInteger iId = 0;
+                if ([rId respondsToSelector:@selector(unsignedIntValue)])
+                    iId = [rId unsignedIntValue];
+                else
+                    iId = [rId intValue];
+
+                ISPRequest * request = [ISPRequest requestForId:iId];
+                if (request)
+                    [request didReceiveResponse:replyDict];
+            } else {
+                // this means we are seeing a notification
+                NSString * uuidStr = [NSString stringWithUTF8String:sourceUUID];
+                ISPDevice * device = [ISPDevice findDeviceWithUUID:uuidStr andType:ickP2pGetDeviceServices(ictx, sourceUUID)];
+                [device handleDeviceNotification:[replyDict stringForKey:@"method"]
+                                          params:[replyDict dictionaryForKey:@"params"]];
+            }
+
+        });
     });
     
 }
@@ -154,7 +158,10 @@ static void gotAMessage(ickP2pContext_t *ictx,
     
     if (error != ICKERR_SUCCESS) {
 		[self evaluateConnectionError];
-        [_owner didReceiveError:[NSString stringWithFormat:@"[CONN] Cannot send request. Error %d", error]];
+
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [_owner didReceiveError:[NSString stringWithFormat:@"[CONN] Cannot send request. Error %d", error]];
+        });
     }    
 }
 
