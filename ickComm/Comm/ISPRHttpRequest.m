@@ -122,7 +122,7 @@
     NSString * replyStr = nil;
     reply = [NSJSONSerialization JSONObjectWithData:_mReplyBody options:NSJSONReadingMutableContainers error:nil];
 
-    NSLog(@"data: \n###%@###", [[NSString alloc] initWithData:_mReplyBody encoding: NSUTF8StringEncoding]);
+   // NSLog(@"data: \n###%@###", [[NSString alloc] initWithData:_mReplyBody encoding: NSUTF8StringEncoding]);
 
 	if(![reply isKindOfClass: [NSDictionary class]]) {
         if (!replyStr)
