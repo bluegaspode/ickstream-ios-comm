@@ -54,10 +54,13 @@ static void gotAMessage(ickP2pContext_t *ictx,
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
         NSError * error;
         id reply = [NSJSONSerialization JSONObjectWithData:messageData options:NSJSONReadingMutableContainers error:&error];
+        if (error!=nil) {
+            NSLog(@"error deserializing message from server: %@", error);
+        }
 
 
         dispatch_async(dispatch_get_main_queue(), ^{
-            NSLog(@"error: %@", error);
+
             /*if ([[UIDevice currentDevice] isIOS5]) {
              reply = [NSJSONSerialization JSONObjectWithData:[NSData dataWithBytes:message length:message_size] options:NSJSONReadingMutableContainers error:nil];
              } else {
