@@ -64,8 +64,6 @@
 }
 
 - (void)setPlaylistInfo:(NSDictionary *)newInfo {
-    if ([newInfo isEqual:_playlistInfo])
-        return;
     _playlistInfo = newInfo;
     [[NSNotificationCenter defaultCenter] postNotificationName:@"ISPPlaylistChanged" 
                                                         object:self     
