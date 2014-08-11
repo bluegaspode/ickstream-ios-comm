@@ -1,9 +1,9 @@
 //
 //  ISPUserViewController.m
-//  ickStreamProto
+//  ickComm
 //
 //  Created by Jörg Schwieder on 03.06.12.
-//  Copyright (c) 2012 Du!Business GmbH. All rights reserved.
+//  Copyright (c) 2014 ickStream GmbH. All rights reserved.
 //
 
 #import "ISPUserViewController.h"

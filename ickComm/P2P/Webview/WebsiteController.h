@@ -1,9 +1,9 @@
 //
 //  WebsiteController.h
-//  TwitterTest
+//  ickComm
 //
 //  Created by Karsten Silz on 28.10.10.
-//  Copyright 2010 __MyCompanyName__. All rights reserved.
+//  Copyright (c) 2014 ickStream GmbH. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>

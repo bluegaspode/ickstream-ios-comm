@@ -1,9 +1,9 @@
 //
 //  UIDevice_ickStream.m
-//  ickStreamProto
+//  ickComm
 //
 //  Created by Jörg Schwieder on 22.03.11.
-//  Copyright 2011 Du!Business GmbH. All rights reserved.
+//  Copyright (c) 2014 ickStream GmbH. All rights reserved.
 //
 
 #import "UIDevice_ickStream.h"

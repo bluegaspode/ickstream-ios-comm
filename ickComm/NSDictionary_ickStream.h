@@ -1,9 +1,9 @@
 //
-//  NSDictionary_iPeng.h
-//  iPengApp
+//  NSDictionary_ickStream.h
+//  ickComm
 //
 //  Created by Jörg Schwieder on 07.07.09.
-//  Copyright 2009 __MyCompanyName__. All rights reserved.
+//  Copyright (c) 2014 ickStream GmbH. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>

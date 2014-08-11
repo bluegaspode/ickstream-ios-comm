@@ -1,9 +1,9 @@
 //
-//  NSString_iPeng.m
-//  iPengApp
+//  NSString_ickStream.m
+//  ickComm
 //
 //  Created by Jörg Schwieder on 07.08.09.
-//  Copyright 2009 __MyCompanyName__. All rights reserved.
+//  Copyright (c) 2014 ickStream GmbH. All rights reserved.
 //
 
 #import "NSString_ickStream.h"

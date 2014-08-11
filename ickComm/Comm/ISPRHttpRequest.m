@@ -1,9 +1,9 @@
 //
 //  ISPRHttpRequest.m
-//  ickStreamProto
+//  ickComm
 //
 //  Created by Jörg Schwieder on 15.05.12.
-//  Copyright (c) 2012 Du!Business GmbH. All rights reserved.
+//  Copyright (c) 2014 ickStream GmbH. All rights reserved.
 //
 
 #import "ISPRHttpRequest.h"

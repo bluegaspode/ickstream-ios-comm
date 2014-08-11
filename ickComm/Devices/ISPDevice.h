@@ -1,9 +1,9 @@
 //
 //  ISPDevice.h
-//  ickStreamProto
+//  ickComm
 //
 //  Created by Jörg Schwieder on 11.04.12.
-//  Copyright (c) 2012 Du!Business GmbH. All rights reserved.
+//  Copyright (c) 2014 ickStream GmbH. All rights reserved.
 //
 // This is the general Objecticve C device wrapper.
 // A device currently can be a controller or a player

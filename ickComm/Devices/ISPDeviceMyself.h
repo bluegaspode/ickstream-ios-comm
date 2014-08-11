@@ -1,9 +1,9 @@
 //
 //  ISPDeviceMyself.h
-//  ickStreamProto
+//  ickComm
 //
 //  Created by Jörg Schwieder on 11.05.12.
-//  Copyright (c) 2012 Du!Business GmbH. All rights reserved.
+//  Copyright (c) 2014 ickStream GmbH. All rights reserved.
 //
 // This is a wrapper for any logic that refers to the app itself - there are still two classes to be used because we might be either one of a player or a server....
 
