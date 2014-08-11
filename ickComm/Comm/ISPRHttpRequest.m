@@ -41,6 +41,7 @@
     if (self) {
         self.owner = anOwner;
         [self setHTTPMethod:@"POST"];
+        [self addValue:@"application/json;charset=utf-8" forHTTPHeaderField:@"Content-Type"]; // set correct content type
         busy = NO;
     }
     return self;

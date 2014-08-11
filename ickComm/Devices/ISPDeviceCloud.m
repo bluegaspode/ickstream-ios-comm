@@ -14,6 +14,17 @@
 #import "ISPSpinner.h"
 #import "NSDictionary_ickStream.h"
 
+
+
+NSString * const kDefaultCloudCoreURLString = @"https://api.ickstream.com/ickstream-cloud-core/";
+
+
+
+static NSString * baseURLString = nil;
+static NSURL * cloudCoreURL = nil;
+
+
+
 @interface ISPDeviceCloud ()
 
 //@property (strong, nonatomic) NSMutableDictionary * services;
@@ -30,6 +41,7 @@ static __strong ISPDeviceCloud * _singleton;
 + (void)initialize {
     static dispatch_once_t pred = 0;
     dispatch_once(&pred, ^{
+        baseURLString = kDefaultCloudCoreURLString;
         _singleton = [[self alloc] init];
     });
    
@@ -124,10 +136,42 @@ static __strong ISPDeviceCloud * _singleton;
     return self;
 }
 
-- (NSURL *)url {
-    //    return [NSURL URLWithString:@"http://ickstream.isaksson.info/ickstream-cloud-core/jsonrpc"];
-    return [NSURL URLWithString:@"http://api.ickstream.com/ickstream-cloud-core/jsonrpc"];
+
+#pragma mark - cloud core URL
+
+//  allow cloud core URL configuration.
+// The actual configuration has to be done by the using App
+// This defaults to the default cloud core URL
+
++ (void)setBaseCloudCoreURLString:(NSString *)urlString {
+    if (urlString.length == 0) {
+        baseURLString = kDefaultCloudCoreURLString;
+    } else {
+        if (![urlString hasSuffix:@"/"])
+            urlString = [NSString stringWithFormat:@"%@/", urlString];
+        baseURLString = urlString;
+    }
 }
+
++ (NSString *)baseCloudCoreURLString {
+    return baseURLString;
+}
+
+- (NSURL *)url {
+    if (!cloudCoreURL) {
+        NSString * urlString = baseURLString;
+        urlString = [NSString stringWithFormat:@"%@jsonrpc", urlString];
+        
+        cloudCoreURL = [NSURL URLWithString:urlString];
+    }
+    return cloudCoreURL;
+}
+
+- (NSString *)cloudURL {
+    return cloudCoreURL.absoluteString;
+}
+
+#pragma mark - atomic request
 
 - (NSObject<ISPAtomicRequestProtocol> *)atomicRequestForService:(NSString *)aServiceId owner:(ISPRequest *)owner {
     NSMutableURLRequest<ISPAtomicRequestProtocol> * request = [[ISPRHttpRequest alloc] initWithOwner:owner andDevice:self];

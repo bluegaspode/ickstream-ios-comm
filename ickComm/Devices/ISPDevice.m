@@ -260,6 +260,14 @@ static BOOL ickStreamActive = NO;
 #pragma mark - cloud ops {
 
 - (void)checkAccount {
+    
+    // For now, devices which use different cloud urls are on different accounts
+    
+    if (self.cloudURL && ![self.cloudURL isEqualToString:ISPDeviceCloud.singleton.cloudURL]) {
+        self.known = NO;
+        return;
+    }
+    
     [ISPRequest automaticRequestWithDevice:[ISPDeviceCloud singleton]
                                    service:nil
                                     method:@"getDevice" 
@@ -299,6 +307,12 @@ static BOOL ickStreamActive = NO;
                                  string = [result stringForKey:@"playerName"];
                                  if (string) {
                                      _defaultName = string;
+                                     change = YES;
+                                 }
+                                 
+                                 string = [result stringForKey:@"cloudCoreUrl"];
+                                 if (string) {
+                                     _cloudURL = string;
                                      change = YES;
                                  }
                                  
@@ -382,7 +396,7 @@ static BOOL ickStreamActive = NO;
     //if (!cUrl)
     //    return nil;
     //return [NSURL URLWithString:[NSString stringWithUTF8String:cUrl]];
-    return [_url baseURL];
+    return [_url absoluteURL];      // don't use baseURL since that's usually empty
 }
 
 - (NSString *)displayName {

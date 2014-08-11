@@ -14,5 +14,7 @@
 - (void)getCloudServices;
 - (void)getDevicesForUser;
 + (NSString *)applicationId;
++ (void)setBaseCloudCoreURLString:(NSString *)urlString;
++ (NSString *)baseCloudCoreURLString;
 
 @end

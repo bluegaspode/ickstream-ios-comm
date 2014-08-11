@@ -24,6 +24,9 @@
 @property (nonatomic) BOOL                                  known;
 @property (nonatomic, readonly) BOOL                        validated;
 
+// The cloud core URL can be different between devices. It's a status parameter
+@property (strong, nonatomic, readonly)   NSString *        cloudURL;
+
 
 + (void)registerInDeviceList:(ISPDevice *)newDevice;
 + (ISPDevice *)findDeviceWithUUID:(NSString *)aUuid andType:(ickP2pServicetype_t)type;

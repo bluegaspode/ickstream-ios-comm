@@ -11,6 +11,7 @@
 #import "ISPRHttpRequest.h"
 #import "ISPRequest.h"
 #import "ISPSpinner.h"
+#import "ISPDeviceCloud.h"
 
 #import "ISPUserViewController.h"
 #import "WebsiteController.h"
@@ -153,8 +154,11 @@ static NSURLConnection * _urlConnection = nil;
         dispatch_sync_safe(dispatch_get_main_queue(), ^{
             if (_tokenWebView)
                 return;
+            
+            NSString * apiUrlString = [ISPDeviceCloud baseCloudCoreURLString]; // use configurable cloud core URL
+            
             _tokenWebView = [[WebsiteController alloc] initWithCapabilities:kWebsiteNavigation
-                                                                 andCommand:[NSString stringWithFormat:@"https://api.ickstream.com/ickstream-cloud-core/oauth?redirect_uri=%@&client_id=%@", REDIRECT_URL_AUTH1, [ISPDeviceMyself myselfApplicationId]]];
+                                                                 andCommand:[NSString stringWithFormat:@"%@oauth?redirect_uri=%@&client_id=%@", apiUrlString, REDIRECT_URL_AUTH1, [ISPDeviceMyself myselfApplicationId]]];
             [_tokenWebView addLinkCheckBlock:^BOOL(IPWebView *webView, NSURLRequest *request, UIWebViewNavigationType navigationType) {
                 if (!SSL_authenticated) {
                     _urlConnection = [[NSURLConnection alloc] initWithRequest:request delegate:self];
@@ -170,7 +174,7 @@ static NSURLConnection * _urlConnection = nil;
                     if (arr.count == 2) {
                         token = arr[1];
                         
-                        NSURLRequest * aRequest = [NSURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://api.ickstream.com/ickstream-cloud-core/oauth/token?redirect_uri=%@&code=%@", REDIRECT_URL_AUTH1, token]]];
+                        NSURLRequest * aRequest = [NSURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@oauth/token?redirect_uri=%@&code=%@", apiUrlString, REDIRECT_URL_AUTH1, token]]];
                         [NSURLConnection sendAsynchronousRequest:aRequest
                                                            queue:[NSOperationQueue mainQueue]
                                                completionHandler:^(NSURLResponse * response, NSData * data, NSError * error) {
@@ -193,7 +197,7 @@ static NSURLConnection * _urlConnection = nil;
             }];
             __strong UINavigationController * navC = [[UINavigationController alloc] initWithRootViewController:_tokenWebView];
 
-            NSObject *tmp=[UIApplication sharedApplication].keyWindow;
+            //NSObject *tmp=[UIApplication sharedApplication].keyWindow;
             [[UIApplication sharedApplication].keyWindow.rootViewController presentViewController:navC animated:YES completion:nil];
         });
         
@@ -217,40 +221,104 @@ static NSURLConnection * _urlConnection = nil;
     if (!aMyself)
         return;
     
-    _rdRequest = [ISPRequest automaticRequestWithDevice:aMyself 
-                                   service:nil
-                                    method:@"addDeviceWithHardwareId"
-                                    params:[NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                            sUuid, @"id",
-                                            @"ickStreamDevice", @"model",
-                                            aMyself.name, @"name",
-                                            @"127.0.0.1", @"address",
-                                            [self myselfHardwareId], @"hardwareId",
-                                            [self myselfApplicationId], @"applicationId",
-                                            nil]
-                             withResponder:^(NSDictionary *result, ISPRequest *request) {
-                                 [ISPSpinner hideSpinnerAnimated:YES];
-                                 NSString * token = [result stringForKey:@"accessToken"];
-                                 NSLog(@"New access Token: %@", token);
-                                 NSString * theId = [result stringForKey:@"id"];
-                                 if ([theId isEqualToString:[self myselfUUID]]) {
-                                     NSUserDefaults * defaults = [NSUserDefaults standardUserDefaults];
-                                     [defaults setObject:token forKey:@"myselfToken"];
-                                     [defaults synchronize];
-                                     [[NSNotificationCenter defaultCenter] postNotificationName:@"ISPAccessTokenAcquiredNotification" object:aMyself userInfo:nil];
-                                 }
-                                 _rdRequest = nil;
-                             } withErrorResponder:^(NSString *errorString, ISPRequest *request) {
-                                 [ISPSpinner hideSpinnerAnimated:YES];
-                                 NSLog(@"%@", errorString);
-                                 _rdRequest = nil;
-                                 _useAlert = YES;
-                                 _userToken = nil;
-                             }];
+    NSDictionary * params = @{
+                              @"id" : sUuid,
+                              @"name" : aMyself.name,
+                              @"applicationId" : [self myselfApplicationId]// not required since we are authenticated
+                              };
     
-    //        [defaults setObject:state forKey:(NSString *)key];
-    //        if (store)
-    //            [defaults synchronize];
+    
+    void (^cantRegister)(NSString *errorString, ISPRequest *request) = ^(NSString *errorString, ISPRequest *request) {
+        [ISPSpinner hideSpinnerAnimated:YES];
+        NSLog(@"%@", errorString);
+        _rdRequest = nil;
+        _useAlert = YES;
+        _userToken = nil;
+    };
+    
+    // new registration process: use createDeviceRegistrationToken, followed by addDevice
+    // addDeviceWithHardwareId is deprecated
+    // This is the same process as for remote device registration
+    
+    // get one-time registration token via createDeviceRegistrationToken
+    
+    _rdRequest = [ISPRequest automaticRequestWithDevice:aMyself
+                                                service:nil
+                                                 method:@"createDeviceRegistrationToken"
+                                                 params:params
+                                          withResponder:^(NSDictionary *result, ISPRequest *request) {
+                                              
+                                              NSString * token = [result stringForKey:@"text"];
+                                              
+                                              // we can't use ISPRequest based communication since it always authenticates with the user token or the device token.
+                                              
+                                              NSURL * url = ISPDeviceCloud.singleton.url;
+                                              
+                                              NSMutableURLRequest * aRequest = [NSMutableURLRequest requestWithURL:url];
+                                              [aRequest addValue:[NSString stringWithFormat:@"Bearer %@", token]
+                                              forHTTPHeaderField:@"Authorization"];
+                                              [aRequest setHTTPMethod:@"POST"];
+                                              NSDictionary * params = @{
+                                                                        @"hardwareId" : [self myselfHardwareId],
+                                                                        @"applicationId" : [self myselfApplicationId],
+                                                                        @"address" : @"127.0.0.1"
+                                                                        };
+                                              NSDictionary * dict = @{
+                                                                      @"params" : params,
+                                                                      @"method" : @"addDevice",
+                                                                      @"jsonrpc" : @"2.0",
+                                                                      @"id" : @([ISPRequest newRequestId])
+                                                                      };
+                                              
+                                              NSError * error;
+                                              NSData * body = [NSJSONSerialization dataWithJSONObject:dict
+                                                                                              options:0
+                                                                                                error:&error];
+                                              [aRequest setHTTPBody:body];
+                                              [aRequest addValue:@"application/json;charset=utf-8" forHTTPHeaderField:@"Content-Type"];
+                                              [aRequest setCachePolicy:NSURLRequestReloadIgnoringCacheData];
+                                              
+                                              [NSURLConnection sendAsynchronousRequest:aRequest
+                                                                                 queue:[NSOperationQueue mainQueue]
+                                                                     completionHandler:^(NSURLResponse * response, NSData * data, NSError * error) {
+                                                                         
+                                                                         if (error) {
+                                                                             cantRegister([error localizedDescription], nil);
+                                                                             return;
+                                                                         }
+                                                                         
+                                                                         NSDictionary * reply = [NSJSONSerialization JSONObjectWithData:data
+                                                                                                                                options:0
+                                                                                                                                  error:nil];
+                                                                         if (![reply isKindOfClass:[NSDictionary class]]) {
+                                                                             cantRegister(@"addDevice: unexpected response", nil);
+                                                                             return;
+                                                                         }
+                                                                         NSDictionary * result = [reply dictionaryForKey:@"result"];
+                                                                         if (!result) {
+                                                                             cantRegister([NSString stringWithFormat:@"addDevice: unexpected response %@", reply], nil);
+                                                                             return;
+                                                                         }
+                                                                         NSString * atoken = result[@"accessToken"];
+                                                                         if (![atoken isKindOfClass:[NSString class]]) {
+                                                                             cantRegister([NSString stringWithFormat:@"addDevice: invalid access token: %@", atoken], nil);
+                                                                             return;
+                                                                         }
+                                                                         
+                                                                         // access token found
+                                                                         
+                                                                         [ISPSpinner hideSpinnerAnimated:YES];
+                                                                         NSString * theId = [result stringForKey:@"id"];
+                                                                         if ([theId isEqualToString:[self myselfUUID]]) {
+                                                                             NSUserDefaults * defaults = [NSUserDefaults standardUserDefaults];
+                                                                             [defaults setObject:atoken forKey:@"myselfToken"];
+                                                                             [defaults synchronize];
+                                                                             [[NSNotificationCenter defaultCenter] postNotificationName:@"ISPAccessTokenAcquiredNotification" object:aMyself userInfo:nil];
+                                                                         }
+                                                                         _rdRequest = nil;
+                                                                     }];
+                                          }
+                                     withErrorResponder:cantRegister];
 }
 
 
@@ -426,9 +494,10 @@ static NSURLConnection * _urlConnection = nil;
     return [NSString stringWithFormat:@"Bearer %@", [ISPDeviceMyself myselfUserToken]];
 }
 
+// use single entity for URL, it's configurable now.
 
 - (NSURL *)url {
-    return [NSURL URLWithString:@"http://api.ickstream.com/ickstream-cloud-core/jsonrpc"];
+    return ISPDeviceCloud.singleton.url;
 }
 
 - (NSObject<ISPAtomicRequestProtocol> *)atomicRequestForService:(NSString *)aServiceId owner:(ISPRequest *)owner {
