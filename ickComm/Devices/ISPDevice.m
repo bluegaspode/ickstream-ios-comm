@@ -262,8 +262,17 @@ static BOOL ickStreamActive = NO;
 - (void)checkAccount {
     
     // For now, devices which use different cloud urls are on different accounts
+    // But ignore http vs. https because some players are still using http
     
-    if (self.cloudURL && ![self.cloudURL isEqualToString:ISPDeviceCloud.singleton.cloudURL]) {
+    BOOL(^compareURLSchemeInsensitive)(NSString *, NSString *) = ^(NSString * url1, NSString * url2) {
+        url1 = [url1 stringByReplacingOccurrencesOfString:@"http://" withString:@""];
+        url1 = [url1 stringByReplacingOccurrencesOfString:@"https://" withString:@""];
+        url2 = [url2 stringByReplacingOccurrencesOfString:@"http://" withString:@""];
+        url2 = [url2 stringByReplacingOccurrencesOfString:@"https://" withString:@""];
+        return [url1 isEqualToString:url2];
+    };
+    
+    if (self.cloudURL && !compareURLSchemeInsensitive(self.cloudURL, ISPDeviceCloud.singleton.cloudURL)) {
         self.known = NO;
         return;
     }
