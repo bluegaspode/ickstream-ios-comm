@@ -23,6 +23,8 @@
 + (NSString *)deviceAuthorization;
 + (void)setApplicationId:(NSString *)newId;
 
++ (NSString *)myselfApplicationId;
+
 + (ISPDeviceMyself *)findMyselfOfType:(ickP2pServicetype_t)type;
 - (id)initWithType:(ickP2pServicetype_t)type;
 

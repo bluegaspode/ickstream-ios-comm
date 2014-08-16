@@ -14,4 +14,5 @@
 @property (strong, nonatomic, readwrite) NSDictionary * playlistInfo;
 @property (strong, nonatomic, readwrite) NSArray * playlistTracks;
 
+- (void)registerPlayer;
 @end

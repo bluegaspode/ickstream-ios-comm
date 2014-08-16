@@ -7,9 +7,10 @@
 //
 
 #import "ISPPlayer.h"
-#import "NSDictionary_ickStream.h"
+#import "ISPDeviceCloud.h"
+#import "ISPDeviceMyself.h"
 
-@interface ISPPlayer()
+@interface ISPPlayer ()
 
 
 @end
@@ -30,10 +31,10 @@
         return;
     if ([method isEqualToString:@"playerStatusChanged"]) {
         if (params)
-            self.status = params;        
+            self.status = params;
     } else if ([method isEqualToString:@"playbackQueueChanged"]) {
         if (params)
-            self.playlistInfo = params;        
+            self.playlistInfo = params;
     }
 
 }
@@ -52,9 +53,9 @@
         [self checkAccount];
     }
     _status = newStatus;
-    
+
     [[NSNotificationCenter defaultCenter] postNotificationName:@"ISPPlayerStatusChanged"
-                                                        object:self     
+                                                        object:self
                                                       userInfo:newStatus];
     if (isRegistered != newIsRegistered) {
         [[NSNotificationCenter defaultCenter] postNotificationName:@"ISPPlayerListChangedNotification"
@@ -65,8 +66,8 @@
 
 - (void)setPlaylistInfo:(NSDictionary *)newInfo {
     _playlistInfo = newInfo;
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"ISPPlaylistChanged" 
-                                                        object:self     
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"ISPPlaylistChanged"
+                                                        object:self
                                                       userInfo:newInfo];
 }
 
@@ -77,12 +78,30 @@
                                     method:@"getPlayerStatus"
                                     params:nil
                              withResponder:^(NSDictionary *result, ISPRequest *request) {
-                                 dispatch_async(dispatch_get_main_queue(), ^{
-                                     self.status = result;
-                                 });
-                             } withErrorResponder:^(NSString *errorString, ISPRequest *request) {
-                                 NSLog(@"status error");
-                             }];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            self.status = result;
+        });
+    } withErrorResponder:^(NSString *errorString, ISPRequest *request) {
+        NSLog(@"status error");
+    }];
+}
+
+
+- (void)registerPlayer {
+    NSDictionary *params = @{@"id" : self.uuid, @"name" : self.name, @"applicationId" : [ISPDeviceMyself myselfApplicationId]};
+
+    [ISPRequest automaticRequestWithDevice:[ISPDeviceCloud singleton] service:nil method:@"createDeviceRegistrationToken" params:params
+                             withResponder:^(NSDictionary *result, ISPRequest *request) {
+        NSString *token = [result stringForKey:@"text"];
+        NSDictionary *setPlConfigParams = @{@"deviceRegistrationToken" : token};
+        [ISPRequest automaticRequestWithDevice:self service:@"" method:@"setPlayerConfiguration" params:setPlConfigParams];
+    }
+                        withErrorResponder:^(NSString *errorString, ISPRequest *request) {
+        NSLog(@"status error");
+    }
+    ];
+
+
 }
 
 @end
