@@ -59,7 +59,7 @@
     if (isRegistered != newIsRegistered) {
         [[NSNotificationCenter defaultCenter] postNotificationName:@"ISPPlayerListChangedNotification"
                                                             object:self
-                                                          userInfo:nil];
+                                                          userInfo:@{@"type" : @"other"}];
     }
 }
 
