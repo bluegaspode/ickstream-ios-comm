@@ -54,24 +54,19 @@ static void gotADevice(ickP2pContext_t *ictx, const char * UUID, ickP2pDeviceSta
     
     char * IP = ickP2pGetDeviceLocation(ictx, UUID);
     NSString * uuidString = [NSString stringWithUTF8String:UUID];
+    NSDictionary *stateToStringMap=@{
+            @(ICKP2P_INITIALIZED):@"initialized",
+            @(ICKP2P_CONNECTED):@"connected",
+            @(ICKP2P_DISCONNECTED):@"disconnected",
+            @(ICKP2P_DISCOVERED):@"discovered",
+            @(ICKP2P_BYEBYE):@"byebye",
+            @(ICKP2P_EXPIRED):@"expired",
+            @(ICKP2P_TERMINATE):@"terminate",
+            @(ICKP2P_INVENTORY):@"inventory",
+            @(ICKP2P_ERROR):@"error"
+    };
     
-    NSString * strChange = nil;
-    switch (change) {
-        case ICKP2P_CONNECTED:
-            strChange = @"added";
-            break;
-            //case ICKDISCOVERY_UPDATE_DEVICE:
-            //strChange = @"updated";
-            break;
-        case ICKP2P_DISCONNECTED:
-            strChange = @"removed";
-            break;
-        default:
-            strChange = @"irritated";
-            break;
-    }
-    
-    NSLog(@"\nDevice %@: UUID: %s, IP: %s, type: %d\n\n", strChange, UUID, IP, type);
+    NSLog(@"\nDevice %@: UUID: %s, IP: %s, type: %d\n\n", stateToStringMap[@(change)], UUID, IP, type);
     
     //    char * msg = NULL;
     //    asprintf(&msg, "Hello from %s", [[UIDevice currentDevice].name UTF8String]);
