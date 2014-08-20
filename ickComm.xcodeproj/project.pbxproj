@@ -370,6 +370,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		4C23A90019A5663B00B94B17 /* ickstream-p2p */ = {
+			isa = PBXGroup;
+			children = (
+				4CD8E8501925F99300B8E3BD /* ickp2p */,
+				4CD8E8671925F99300B8E3BD /* miniupnp */,
+			);
+			path = "ickstream-p2p";
+			sourceTree = "<group>";
+		};
 		4CD8E7FF1925F8BC00B8E3BD = {
 			isa = PBXGroup;
 			children = (
@@ -470,9 +479,8 @@
 		4CD8E84F1925F99300B8E3BD /* P2P */ = {
 			isa = PBXGroup;
 			children = (
+				4C23A90019A5663B00B94B17 /* ickstream-p2p */,
 				7163DD76194866A3005A1698 /* libwebsockets */,
-				4CD8E8501925F99300B8E3BD /* ickp2p */,
-				4CD8E8671925F99300B8E3BD /* miniupnp */,
 			);
 			path = P2P;
 			sourceTree = "<group>";
@@ -666,6 +674,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 4CD8E82B1925F8BC00B8E3BD /* Build configuration list for PBXNativeTarget "ickComm" */;
 			buildPhases = (
+				4C23A90119A5673300B94B17 /* ShellScript */,
 				4CD8E8041925F8BC00B8E3BD /* Sources */,
 				4CD8E8051925F8BC00B8E3BD /* Frameworks */,
 				D035006419558C4E00A7E021 /* CopyFiles */,
@@ -795,6 +804,22 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		4C23A90119A5673300B94B17 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "#!/bin/sh\ncd \"$SRCROOT\"/ickComm/P2P/ickstream-p2p/miniupnp/miniupnpc\n/bin/sh ./updateminiupnpcstrings.sh";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		4CD8E8041925F8BC00B8E3BD /* Sources */ = {
