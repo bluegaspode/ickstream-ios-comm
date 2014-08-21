@@ -1,0 +1,6 @@
+[submodule "ickComm/P2P/libwebsockets"]
+	path = ickComm/P2P/libwebsockets
+	url = https://github.com/ickStream/libwebsockets.git
+[submodule "ickComm/P2P/ickstream-p2p"]
+	path = ickComm/P2P/ickstream-p2p
+	url = https://github.com/ickStream/ickstream-p2p.git
