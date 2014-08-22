@@ -213,6 +213,7 @@
 		4C5FEBFC192D5D0F0037CB9C /* ISPSpinner.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ISPSpinner.xib; sourceTree = "<group>"; };
 		4C5FEBFE192D67750037CB9C /* Notifications.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; path = Notifications.rtf; sourceTree = "<group>"; };
 		4C5FEC00192D70350037CB9C /* README_Request_Classes */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README_Request_Classes; sourceTree = "<group>"; };
+		4CAEE5BC19A7FB1500410073 /* config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = config.h; sourceTree = "<group>"; };
 		4CD8E8081925F8BC00B8E3BD /* libickComm.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libickComm.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		4CD8E80B1925F8BC00B8E3BD /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		4CD8E80F1925F8BC00B8E3BD /* ickComm-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ickComm-Prefix.pch"; sourceTree = "<group>"; };
@@ -479,6 +480,7 @@
 		4CD8E84F1925F99300B8E3BD /* P2P */ = {
 			isa = PBXGroup;
 			children = (
+				4CAEE5BC19A7FB1500410073 /* config.h */,
 				4C23A90019A5663B00B94B17 /* ickstream-p2p */,
 				7163DD76194866A3005A1698 /* libwebsockets */,
 			);
@@ -646,7 +648,8 @@
 				7163DD94194869E4005A1698 /* sha-1.c */,
 				7163DDB719486B18005A1698 /* config.h */,
 			);
-			path = libwebsockets;
+			name = libwebsockets;
+			path = libwebsockets/lib;
 			sourceTree = "<group>";
 		};
 		71F443A7194EFD100028AE5A /* ickComm Bundle */ = {
