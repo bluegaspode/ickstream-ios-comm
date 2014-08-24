@@ -213,6 +213,7 @@
 		4C5FEBFC192D5D0F0037CB9C /* ISPSpinner.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ISPSpinner.xib; sourceTree = "<group>"; };
 		4C5FEBFE192D67750037CB9C /* Notifications.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; path = Notifications.rtf; sourceTree = "<group>"; };
 		4C5FEC00192D70350037CB9C /* README_Request_Classes */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README_Request_Classes; sourceTree = "<group>"; };
+		4CAEE5BC19A7FB1500410073 /* config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = config.h; sourceTree = "<group>"; };
 		4CD8E8081925F8BC00B8E3BD /* libickComm.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libickComm.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		4CD8E80B1925F8BC00B8E3BD /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		4CD8E80F1925F8BC00B8E3BD /* ickComm-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ickComm-Prefix.pch"; sourceTree = "<group>"; };
@@ -370,6 +371,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		4C23A90019A5663B00B94B17 /* ickstream-p2p */ = {
+			isa = PBXGroup;
+			children = (
+				4CD8E8501925F99300B8E3BD /* ickp2p */,
+				4CD8E8671925F99300B8E3BD /* miniupnp */,
+			);
+			path = "ickstream-p2p";
+			sourceTree = "<group>";
+		};
 		4CD8E7FF1925F8BC00B8E3BD = {
 			isa = PBXGroup;
 			children = (
@@ -470,9 +480,9 @@
 		4CD8E84F1925F99300B8E3BD /* P2P */ = {
 			isa = PBXGroup;
 			children = (
+				4CAEE5BC19A7FB1500410073 /* config.h */,
+				4C23A90019A5663B00B94B17 /* ickstream-p2p */,
 				7163DD76194866A3005A1698 /* libwebsockets */,
-				4CD8E8501925F99300B8E3BD /* ickp2p */,
-				4CD8E8671925F99300B8E3BD /* miniupnp */,
 			);
 			path = P2P;
 			sourceTree = "<group>";
@@ -638,7 +648,8 @@
 				7163DD94194869E4005A1698 /* sha-1.c */,
 				7163DDB719486B18005A1698 /* config.h */,
 			);
-			path = libwebsockets;
+			name = libwebsockets;
+			path = libwebsockets/lib;
 			sourceTree = "<group>";
 		};
 		71F443A7194EFD100028AE5A /* ickComm Bundle */ = {
@@ -666,6 +677,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 4CD8E82B1925F8BC00B8E3BD /* Build configuration list for PBXNativeTarget "ickComm" */;
 			buildPhases = (
+				4C23A90119A5673300B94B17 /* ShellScript */,
 				4CD8E8041925F8BC00B8E3BD /* Sources */,
 				4CD8E8051925F8BC00B8E3BD /* Frameworks */,
 				D035006419558C4E00A7E021 /* CopyFiles */,
@@ -795,6 +807,22 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		4C23A90119A5673300B94B17 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "#!/bin/sh\ncd \"$SRCROOT\"/ickComm/P2P/ickstream-p2p/miniupnp/miniupnpc\n/bin/sh ./updateminiupnpcstrings.sh";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		4CD8E8041925F8BC00B8E3BD /* Sources */ = {
