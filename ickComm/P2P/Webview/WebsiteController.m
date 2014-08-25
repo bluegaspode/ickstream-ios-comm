@@ -277,6 +277,7 @@ static int kCustomButtonHeight	=	30;
 @property (nonatomic, strong) BOOL(^linkCheckerBlock)(IPWebView *, NSURLRequest *, UIWebViewNavigationType);
 // back / forward buttons for web view
 @property (nonatomic, weak) UISegmentedControl * browserControl;
+@property (nonatomic) NSURL *initialURL;
 
 @end
 
@@ -308,9 +309,9 @@ static __strong NSMutableDictionary * _navControllers = nil;
         _capabilities = capa;
         self.linkCheckerBlock = nil;
         if (aCmd && ![aCmd isKindOfClass:[NSURL class]])
-            [self performSelector:@selector(setLink:) withObject:[NSURL URLWithString:aCmd] afterDelay:0];
+            _initialURL=[NSURL URLWithString:aCmd];
         else
-            [self performSelector:@selector(setLink:) withObject:aCmd afterDelay:0];
+            _initialURL=aCmd;
     }
     return self;
 }
@@ -391,6 +392,9 @@ static __strong NSMutableDictionary * _navControllers = nil;
     [self createLeftBarButton];
     
     //    [self addSearchMenu];
+    if (_initialURL) {
+        [self setLink:_initialURL];
+    }
 }
 
 
@@ -648,7 +652,7 @@ static NSString * _audioPlayOverride = @"";
 }
 
 
-- (void)webViewDidFinishLoad:(UIWebView *)webView {	
+- (void)webViewDidFinishLoad:(UIWebView *)webView {
 	progressCounter--;
 	
 	if (progressCounter < 0) {
