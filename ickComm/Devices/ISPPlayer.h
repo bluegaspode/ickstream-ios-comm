@@ -11,6 +11,7 @@
 @interface ISPPlayer : ISPDevice
 
 @property (strong, nonatomic, readwrite) NSDictionary * status;
+@property (strong, nonatomic, readwrite) NSMutableDictionary *notificationData;
 @property (strong, nonatomic, readwrite) NSDictionary * playlistInfo;
 @property (strong, nonatomic, readwrite) NSArray * playlistTracks;
 

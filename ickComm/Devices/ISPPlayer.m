@@ -19,6 +19,7 @@
 
 @synthesize status = _status;
 @synthesize playlistInfo = _playlistInfo;
+@synthesize notificationData = _notificationData;
 @synthesize playlistTracks = _playlistTracks;
 
 - (id)initWithUUID:(NSString *)aUuid andType:(ickP2pServicetype_t)type {
@@ -35,8 +36,14 @@
     } else if ([method isEqualToString:@"playbackQueueChanged"]) {
         if (params)
             self.playlistInfo = params;
+    } else {
+        NSMutableDictionary *newNotificationData = [[NSMutableDictionary alloc] init];
+        newNotificationData[@"method"] = method;
+        if (params) {
+            newNotificationData[@"params"] = params;
+        }
+        self.notificationData = newNotificationData;
     }
-
 }
 
 - (BOOL)validated {
@@ -62,6 +69,15 @@
                                                             object:self
                                                           userInfo:@{@"type" : @"other"}];
     }
+}
+
+- (void)setNotificationData:(NSMutableDictionary *)notificationData {
+    _notificationData[@"method"] = notificationData[@"method"];
+    _notificationData[@"params"] = notificationData[@"params"];
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"ISPPlayerNotification"
+                                                        object:self
+                                                      userInfo:notificationData];
 }
 
 - (void)setPlaylistInfo:(NSDictionary *)newInfo {
