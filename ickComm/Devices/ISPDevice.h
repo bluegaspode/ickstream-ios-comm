@@ -18,15 +18,13 @@
 @property (nonatomic)           ickP2pServicetype_t         ickType;
 @property (strong, nonatomic, readonly)   NSString *        hardwareId;
 @property (strong, nonatomic, readonly)   NSString *        defaultName;
+@property (strong, nonatomic, readonly)   NSString *        playerModel;
+@property (strong, nonatomic, readwrite)   NSString *        userId;
 @property (strong, nonatomic)   NSString *                  name;
 @property (strong, readonly)      NSURL *                     url;
 @property (strong, nonatomic)    NSMutableDictionary *       services;
 @property (nonatomic) BOOL                                  known;
 @property (nonatomic, readonly) BOOL                        validated;
-
-// The cloud core URL can be different between devices. It's a status parameter
-@property (strong, nonatomic, readonly)   NSString *        cloudURL;
-
 
 + (void)registerInDeviceList:(ISPDevice *)newDevice;
 + (ISPDevice *)findDeviceWithUUID:(NSString *)aUuid andType:(ickP2pServicetype_t)type;
@@ -35,7 +33,9 @@
 - (void)configureWithURLString:(const char *)cURL;
 
 - (void)checkAccount;
-- (void)requestConfigurationForDevice;
+- (void)requestConfigurationForPlayer;
+
+- (void)setUserId:(NSString *)userId;
 
 - (NSURL *)urlForService:(NSString *)serviceId;
 + (void)registerService:(NSString *)aServiceId ofType:(NSString *)serviceType forDevice:(ISPDevice *)aDevice;

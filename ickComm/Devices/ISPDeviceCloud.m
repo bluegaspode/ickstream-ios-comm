@@ -89,7 +89,8 @@ static __strong ISPDeviceCloud * _singleton;
     } withErrorResponder:^(NSString * errorString, ISPRequest * request) {
         // process error
         NSLog(@"%@", errorString);
-        
+
+        // (only) on authorization errors we are going to reset the auth-token
         if ([errorString isEqualToString:@"[CONN] Connect error, code 401."]) {
             // if we have a user token, first try to get authorization again (doesn't survive restart, so not likely)
             // if that fails: clear user token and ask for a new one

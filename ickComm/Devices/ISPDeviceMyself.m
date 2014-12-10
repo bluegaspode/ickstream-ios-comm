@@ -23,8 +23,9 @@
 
 @end
 
-static __strong NSString * _myselfToken = nil;
-static __strong NSString * _myselfUUID = nil;
+static __strong NSString * _myselfToken = nil;  // authToken
+static __strong NSString * _myselfUserId = nil; // userId of account (only if _myselfToken is present)
+static __strong NSString * _myselfUUID = nil;   // UUID of ourself
 static __strong NSString * _myselfApplicationId = nil;
 static __strong NSString * _authorizationString = nil;
 
@@ -38,14 +39,6 @@ static NSMutableDictionary * _deviceCache = nil;
 
 #pragma mark - ID handling
 
-// deprecated to just use UUID but we can refine this later....
-+ (NSString *)myselfHardwareId {
-    if ([UIDevice currentDevice].isIOS6) {
-        return [[NSString stringWithFormat:@"com.ickstream.device%@", [UIDevice currentDevice].identifierForVendor.UUIDString] getSHA1Hash];
-    }
-    return [[UIDevice currentDevice] uniqueGlobalDeviceIdentifier];
-    //return [[NSString stringWithFormat:@"test%@", [[UIDevice currentDevice] uniqueIdentifier]] getSHA1Hash];
-}
 
 + (void)setApplicationId:(NSString *)newId {
     _myselfApplicationId = newId;
@@ -53,10 +46,6 @@ static NSMutableDictionary * _deviceCache = nil;
 
 + (NSString *)myselfApplicationId {
     return _myselfApplicationId;
-}
-
-- (NSString *)hardwareId {
-    return [ISPDeviceMyself myselfHardwareId];
 }
 
 - (NSString *)defaultName {
@@ -91,7 +80,7 @@ static __strong NSString * _userToken = nil;
 
 
 #define HARDWARE_VERIFICATION_RANGE { 3, 10 }
-#define HARDWARE_VERIFICATION_MASK @"%@andverifywith%@"
+#define HARDWARE_VERIFICATION_MASK @"%@andverifywithThisSalt"
 
 + (NSString *)generateMyselfUUID {
     CFUUIDRef uuid = CFUUIDCreate(NULL);
@@ -100,7 +89,7 @@ static __strong NSString * _userToken = nil;
     CFRelease(cfUUID);
     CFRelease(uuid);
     
-    NSString * sshvalue = [[NSString stringWithFormat:HARDWARE_VERIFICATION_MASK, sUuid, [self myselfHardwareId]] getSHA1Hash];
+    NSString * sshvalue = [[NSString stringWithFormat:HARDWARE_VERIFICATION_MASK, sUuid] getSHA1Hash];
     NSRange range = HARDWARE_VERIFICATION_RANGE;
     if ([sshvalue length] < (range.length + range.location))
         return nil;
@@ -108,6 +97,7 @@ static __strong NSString * _userToken = nil;
 
     NSUserDefaults * defaults = [NSUserDefaults standardUserDefaults];
     [defaults removeObjectForKey:@"myselfToken"];
+    [defaults removeObjectForKey:@"myselfUserId"];
     [defaults setObject:sUuid forKey:@"myselfUUID"];
     [defaults setObject:sshvalue forKey:@"myselfVerifier"];
     [defaults synchronize];
@@ -117,9 +107,11 @@ static __strong NSString * _userToken = nil;
 
 + (void)clearMyselfToken {
     _myselfToken = nil;
+    _myselfUserId = nil;
     _authorizationString = nil;
     NSUserDefaults * defaults = [NSUserDefaults standardUserDefaults];
     [defaults removeObjectForKey:@"myselfToken"];
+    [defaults removeObjectForKey:@"myselfUserId"];
     [defaults synchronize];    
 }
 
@@ -259,7 +251,7 @@ static NSURLConnection * _urlConnection = nil;
                                               forHTTPHeaderField:@"Authorization"];
                                               [aRequest setHTTPMethod:@"POST"];
                                               NSDictionary * params = @{
-                                                                        @"hardwareId" : [self myselfHardwareId],
+                                                                        @"hardwareId" : [self myselfUUID],
                                                                         @"applicationId" : [self myselfApplicationId],
                                                                         @"address" : @"127.0.0.1"
                                                                         };
@@ -304,7 +296,12 @@ static NSURLConnection * _urlConnection = nil;
                                                                              cantRegister([NSString stringWithFormat:@"addDevice: invalid access token: %@", atoken], nil);
                                                                              return;
                                                                          }
-                                                                         
+                                                                         NSString * userId = result[@"userId"];
+                                                                         if (![userId isKindOfClass:[NSString class]]) {
+                                                                             cantRegister([NSString stringWithFormat:@"addDevice: invalid userId: %@", atoken], nil);
+                                                                             return;
+                                                                         }
+
                                                                          // access token found
                                                                          
                                                                          [ISPSpinner hideSpinnerAnimated:YES];
@@ -312,6 +309,7 @@ static NSURLConnection * _urlConnection = nil;
                                                                          if ([theId isEqualToString:[self myselfUUID]]) {
                                                                              NSUserDefaults * defaults = [NSUserDefaults standardUserDefaults];
                                                                              [defaults setObject:atoken forKey:@"myselfToken"];
+                                                                             [defaults setObject:userId forKey:@"myselfUserId"];
                                                                              [defaults synchronize];
                                                                              [[NSNotificationCenter defaultCenter] postNotificationName:@"ISPAccessTokenAcquiredNotification" object:aMyself userInfo:nil];
                                                                          }
@@ -322,15 +320,15 @@ static NSURLConnection * _urlConnection = nil;
 }
 
 
-+ (BOOL)validateTokens {
++ (BOOL)validateUUID {
     NSUserDefaults * defaults = [NSUserDefaults standardUserDefaults];
-    NSString * token = [defaults objectForKey:@"myselfUUID"];
-    if (!token) 
+    NSString *uuid = [defaults objectForKey:@"myselfUUID"];
+    if (!uuid)
         return NO;
     NSString * verifier = [defaults objectForKey:@"myselfVerifier"];
     if (!verifier)
         return NO;
-    NSString * sshvalue = [[NSString stringWithFormat:HARDWARE_VERIFICATION_MASK, token, [self myselfHardwareId]] getSHA1Hash];
+    NSString * sshvalue = [[NSString stringWithFormat:HARDWARE_VERIFICATION_MASK, uuid] getSHA1Hash];
     NSRange range = HARDWARE_VERIFICATION_RANGE;
     if ([sshvalue length] < (range.length + range.location))
         return NO;
@@ -342,13 +340,12 @@ static NSURLConnection * _urlConnection = nil;
 
 + (NSString *)myselfUUID {
     if (!_myselfUUID) {
-        if ([self validateTokens]) {
+        if ([self validateUUID]) {
             NSUserDefaults * defaults = [NSUserDefaults standardUserDefaults];
             _myselfUUID = [defaults objectForKey:@"myselfUUID"];            
         }
         else {
             _myselfUUID = [self generateMyselfUUID];
-            [self registerDevice];
         }
     }
     return _myselfUUID;
@@ -356,16 +353,18 @@ static NSURLConnection * _urlConnection = nil;
 
 + (NSString *)myselfToken {
     if (!_myselfToken) {
-        if ([self validateTokens]) {
-            NSUserDefaults * defaults = [NSUserDefaults standardUserDefaults];
-            _myselfToken = [defaults objectForKey:@"myselfToken"];            
-        }
-        else
-            [self generateMyselfUUID];
-        if (!_myselfToken)
-            [self registerDevice];
+       NSUserDefaults * defaults = [NSUserDefaults standardUserDefaults];
+       _myselfToken = [defaults objectForKey:@"myselfToken"];
     }
     return _myselfToken;    
+}
+
++ (NSString *)myselfUserId {
+    if (!_myselfUserId) {
+        NSUserDefaults * defaults = [NSUserDefaults standardUserDefaults];
+        _myselfUserId = [defaults objectForKey:@"myselfUserId"];
+    }
+    return _myselfUserId;
 }
 
 #pragma mark - NURLConnection delegate
@@ -469,6 +468,12 @@ static NSURLConnection * _urlConnection = nil;
     self = [super init];
     if (self) {
         self.ickType = type;
+
+        if ([ISPDeviceMyself myselfToken]==nil) {
+            [ISPDeviceMyself registerDevice];
+        }
+
+
         self.uuid = [ISPDeviceMyself myselfUUID];
         [[self class] registerInDeviceList:self];
         //ickDiscoveryAddService(type);

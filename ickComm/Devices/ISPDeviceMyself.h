@@ -14,8 +14,8 @@
 
 @property (strong, readonly, nonatomic) NSString * deviceAuthorization;
 
-+ (NSString *)myselfHardwareId;
 + (NSString *)myselfToken;
++ (NSString *)myselfUserId;
 + (void)clearMyselfToken;
 + (NSString *)myselfUUID;
 + (NSString *)myselfUserToken;

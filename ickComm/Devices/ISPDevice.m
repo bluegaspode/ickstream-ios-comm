@@ -24,7 +24,7 @@ static ickP2pContext_t *_ickP2pContext = NULL;
 
 + (void)accessTokenAcquired:(NSNotification *)notification;
 
-- (void)requestConfigurationForDevice;
+- (void)requestConfigurationForPlayer;
 
 - (void)requestConfigurationForService;
 
@@ -96,7 +96,7 @@ static void gotADevice(ickP2pContext_t *ictx, const char *UUID, ickP2pDeviceStat
             //[aDevice checkAccount];
 
             if (type & ICKP2P_SERVICE_PLAYER) {
-                [aDevice requestConfigurationForDevice];
+                [aDevice requestConfigurationForPlayer];
                 // See above: server would be ignored!!
             } else if (type & ICKP2P_SERVICE_SERVER_GENERIC)
                 [aDevice requestConfigurationForService];
@@ -266,51 +266,20 @@ static BOOL ickStreamActive = NO;
 #pragma mark - cloud ops {
 
 - (void)checkAccount {
+    self.known = NO;
 
-    // For now, devices which use different cloud urls are on different accounts
-    // But ignore http vs. https because some players are still using http
-
-    BOOL(^compareURLSchemeInsensitive)(NSString *, NSString *) = ^(NSString *url1, NSString *url2) {
-        url1 = [url1 stringByReplacingOccurrencesOfString:@"http://" withString:@""];
-        url1 = [url1 stringByReplacingOccurrencesOfString:@"https://" withString:@""];
-        url2 = [url2 stringByReplacingOccurrencesOfString:@"http://" withString:@""];
-        url2 = [url2 stringByReplacingOccurrencesOfString:@"https://" withString:@""];
-        return [url1 isEqualToString:url2];
-    };
-
-    if (self.cloudURL && !compareURLSchemeInsensitive(self.cloudURL, ISPDeviceCloud.singleton.cloudURL)) {
-        self.known = NO;
+    if (![ISPDeviceMyself myselfUserId] || !self.userId) {
         return;
     }
 
-    [ISPRequest automaticRequestWithDevice:[ISPDeviceCloud singleton]
-                                   service:nil
-                                    method:@"getDevice"
-                                    params:[NSMutableDictionary dictionaryWithObjectsAndKeys:
-                                            self.uuid, @"deviceId", nil]
-                             withResponder:^(NSDictionary *result, ISPRequest *request) {
-        BOOL changed = NO;
-        if (!self.known) {
-            self.known = YES;
-            changed = YES;
-        }
-        NSString *knownName = [result stringForKey:@"name"];
-        if (![knownName isEqualToString:self.name]) {
-            self.name = knownName;
-            changed = YES;
-        }
-        if (changed) {
-            [[NSNotificationCenter defaultCenter] postNotificationName:@"ISPPlayerListChangedNotification" object:self userInfo:@{@"type" : @"other"}];
-        }
-
-    } withErrorResponder:^(NSString *errorString, ISPRequest *request) {
-        NSLog(@"%@", errorString);
-    }];
+    if ([[ISPDeviceMyself myselfUserId] isEqualToString:self.userId]) {
+        self.known = YES;
+    }
 }
 
 // will be called, once a player was detected.
 // we call getPlayerConfiguration and wait for a result before sending a ISPPlayerListChangedNotification
-- (void)requestConfigurationForDevice {
+- (void)requestConfigurationForPlayer {
     [ISPRequest automaticRequestWithDevice:self
                                    service:nil
                                     method:@"getPlayerConfiguration"
@@ -329,11 +298,13 @@ static BOOL ickStreamActive = NO;
             change = YES;
         }
 
-        string = [result stringForKey:@"cloudCoreUrl"];
+        string = [result stringForKey:@"playerModel"];
         if (string) {
-            _cloudURL = string;
+            _playerModel = string;
             change = YES;
         }
+
+        self.userId = [result stringForKey:@"userId"];
 
         if (change) {
             [[NSNotificationCenter defaultCenter] postNotificationName:@"ISPPlayerListChangedNotification" object:self userInfo:@{@"type" : @"added"}];
@@ -343,6 +314,22 @@ static BOOL ickStreamActive = NO;
         NSLog(@"can't request device configuration: %@", self.services);
     }];
 
+}
+
+- (void) setUserId:(NSString*) userId {
+    BOOL userIdChanged=NO;
+    if ([_userId length]==0 && [userId length]>0) {
+        userIdChanged=YES;
+    }
+    if( ![_userId isEqualToString:userId] ) {
+        userIdChanged=YES;
+    }
+
+    _userId=userId;
+
+    if (userIdChanged) {
+        [self checkAccount];
+    }
 }
 
 // will be called, once a service (typically local content service) was detected.
@@ -385,10 +372,18 @@ static BOOL ickStreamActive = NO;
 }
 
 + (void)accessTokenAcquired:(NSNotification *)notification {
+    // when the accessToken was aquired, ISPDeviceMySelf also contains the current userId
+    // it makes sense to check the userId against all known devices and their corresponding userIds
+
     for (NSString *key in _allDevices) {
         ISPDevice *aDevice = [_allDevices objectForKey:key];
-        if (!aDevice.known)
-            [aDevice checkAccount];
+
+        BOOL isKnown=aDevice.known;
+        [aDevice checkAccount];
+
+        if (aDevice.known != isKnown && [aDevice class]==[ISPPlayer class]) {
+           [[NSNotificationCenter defaultCenter] postNotificationName:@"ISPPlayerListChangedNotification" object:aDevice userInfo:@{@"type" : @"other"}];
+        }
     }
 }
 

@@ -31,8 +31,10 @@
     if (!method)
         return;
     if ([method isEqualToString:@"playerStatusChanged"]) {
-        if (params)
+        if (params) {
             self.status = params;
+        }
+
     } else if ([method isEqualToString:@"playbackQueueChanged"]) {
         if (params)
             self.playlistInfo = params;
@@ -47,24 +49,21 @@
 }
 
 - (BOOL)validated {
-    BOOL isRegistered = [[self.status stringForKey:@"cloudCoreStatus"] isEqualToString:@"REGISTERED"];
+    BOOL isRegistered = [self.userId length]>0;
     return self.known && isRegistered;
 }
 
+
 - (void)setStatus:(NSDictionary *)newStatus {
-    BOOL isRegistered = [[self.status stringForKey:@"cloudCoreStatus"] isEqualToString:@"REGISTERED"];
-    BOOL newIsRegistered = [[newStatus stringForKey:@"cloudCoreStatus"] isEqualToString:@"REGISTERED"];
-    // registration state just changed to "registered"
-    if (!isRegistered && newIsRegistered) {
-        self.known = NO;    // can't be known - state just changed
-        [self checkAccount];
-    }
     _status = newStatus;
+
+    BOOL isKnownBefore=self.known;
+    self.userId = [newStatus stringForKey:@"userId"];
 
     [[NSNotificationCenter defaultCenter] postNotificationName:@"ISPPlayerStatusChanged"
                                                         object:self
                                                       userInfo:newStatus];
-    if (isRegistered != newIsRegistered) {
+    if (isKnownBefore != self.known) {
         [[NSNotificationCenter defaultCenter] postNotificationName:@"ISPPlayerListChangedNotification"
                                                             object:self
                                                           userInfo:@{@"type" : @"other"}];
@@ -87,8 +86,8 @@
                                                       userInfo:newInfo];
 }
 
-- (void)requestConfigurationForDevice {
-    [super requestConfigurationForDevice];
+- (void)requestConfigurationForPlayer {
+    [super requestConfigurationForPlayer];
     [ISPRequest automaticRequestWithDevice:self
                                    service:nil
                                     method:@"getPlayerStatus"
