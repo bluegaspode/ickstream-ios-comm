@@ -28,4 +28,7 @@
 + (ISPDeviceMyself *)findMyselfOfType:(ickP2pServicetype_t)type;
 - (id)initWithType:(ickP2pServicetype_t)type;
 
++ (void)registerDevice;
++ (void)hasEnteredToken:(NSString *)token;
+
 @end
