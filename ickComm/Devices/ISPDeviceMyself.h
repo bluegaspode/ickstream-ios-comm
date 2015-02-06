@@ -16,6 +16,9 @@
 
 + (NSString *)myselfToken;
 + (NSString *)myselfUserId;
+
++ (void)setToken:(NSString *)token andUserId:(NSString *)userId;
+
 + (void)clearMyselfToken;
 + (NSString *)myselfUUID;
 + (NSString *)myselfUserToken;

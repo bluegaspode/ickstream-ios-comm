@@ -307,10 +307,8 @@ static NSURLConnection * _urlConnection = nil;
                                                                          [ISPSpinner hideSpinnerAnimated:YES];
                                                                          NSString * theId = [result stringForKey:@"id"];
                                                                          if ([theId isEqualToString:[self myselfUUID]]) {
-                                                                             NSUserDefaults * defaults = [NSUserDefaults standardUserDefaults];
-                                                                             [defaults setObject:atoken forKey:@"myselfToken"];
-                                                                             [defaults setObject:userId forKey:@"myselfUserId"];
-                                                                             [defaults synchronize];
+                                                                             [self setToken:atoken andUserId:userId];
+
                                                                              [[NSNotificationCenter defaultCenter] postNotificationName:@"ISPAccessTokenAcquiredNotification" object:aMyself userInfo:nil];
                                                                          }
                                                                          _rdRequest = nil;
@@ -365,6 +363,18 @@ static NSURLConnection * _urlConnection = nil;
         _myselfUserId = [defaults objectForKey:@"myselfUserId"];
     }
     return _myselfUserId;
+}
+
++ (void) setToken:(NSString *) token andUserId:(NSString *) userId {
+    NSUserDefaults * defaults = [NSUserDefaults standardUserDefaults];
+    [defaults setObject:token forKey:@"myselfToken"];
+    [defaults setObject:userId forKey:@"myselfUserId"];
+    [defaults synchronize];
+
+    _myselfToken=token;
+    _myselfUserId=userId;
+    _authorizationString=nil;
+
 }
 
 #pragma mark - NURLConnection delegate
