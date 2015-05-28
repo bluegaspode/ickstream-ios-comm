@@ -349,6 +349,13 @@ static NSURLConnection * _urlConnection = nil;
     return _myselfUUID;
 }
 
++ (void)clearMyselfUUID {
+    NSUserDefaults * defaults = [NSUserDefaults standardUserDefaults];
+    [defaults removeObjectForKey:@"myselfUUID"];
+    [defaults synchronize];
+    _myselfUUID = nil;
+}
+
 + (NSString *)myselfToken {
     if (!_myselfToken) {
        NSUserDefaults * defaults = [NSUserDefaults standardUserDefaults];
