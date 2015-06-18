@@ -91,6 +91,9 @@ static dispatch_queue_t _allRequestQueue;
 		_persist = YES;
 	} else
 		[self cleanup];
+
+    _errorBlock = nil;
+    _responseBlock = nil;
 }
 
 - (void)cleanup {
